@@ -79,6 +79,9 @@ public:
   void SetFOVAngle(float FOVAngle);
 
   UFUNCTION(BlueprintCallable)
+  void SetupOrtho(float OrthoWidth);
+
+  UFUNCTION(BlueprintCallable)
   float GetFOVAngle() const;
 
   UFUNCTION(BlueprintCallable)

@@ -303,6 +303,19 @@ void UActorBlueprintFunctionLibrary::MakeCameraDefinition(
   AddRecommendedValuesForSensorRoleNames(Definition);
   AddVariationsForSensor(Definition);
 
+  // ORTHO switch
+  FActorVariation ORTHO;
+  ORTHO.Id = TEXT("orthographic");
+  ORTHO.Type = EActorAttributeType::Bool;
+  ORTHO.RecommendedValues = { TEXT("false") };
+  ORTHO.bRestrictToRecommended = false;
+
+  FActorVariation OrthoWidth;
+  OrthoWidth.Id = TEXT("OrthoWidth");
+  OrthoWidth.Type = EActorAttributeType::Float;
+  OrthoWidth.RecommendedValues = { TEXT("10.0") };
+  OrthoWidth.bRestrictToRecommended = false;
+
   // FOV
   FActorVariation FOV;
   FOV.Id = TEXT("fov");
@@ -361,6 +374,8 @@ void UActorBlueprintFunctionLibrary::MakeCameraDefinition(
   LensYSize.bRestrictToRecommended = false;
 
   Definition.Variations.Append({
+      ORTHO,
+      OrthoWidth,
       ResX,
       ResY,
       FOV,
@@ -1412,11 +1427,19 @@ void UActorBlueprintFunctionLibrary::SetCamera(
     ASceneCaptureSensor *Camera)
 {
   CARLA_ABFL_CHECK_ACTOR(Camera);
+    if (RetrieveActorAttributeToBool("orthographic", Description.Variations, false) == false){
+      Camera->SetFOVAngle(
+          RetrieveActorAttributeToFloat("fov", Description.Variations, 90.0f));
+    }
+    else
+    {
+      Camera->SetupOrtho(
+          RetrieveActorAttributeToFloat("OrthoWidth", Description.Variations, 1000.0f)
+        );
+    }
   Camera->SetImageSize(
-      RetrieveActorAttributeToInt("image_size_x", Description.Variations, 800),
-      RetrieveActorAttributeToInt("image_size_y", Description.Variations, 600));
-  Camera->SetFOVAngle(
-      RetrieveActorAttributeToFloat("fov", Description.Variations, 90.0f));
+        RetrieveActorAttributeToInt("image_size_x", Description.Variations, 800),
+        RetrieveActorAttributeToInt("image_size_y", Description.Variations, 600));
   if (Description.Variations.Contains("enable_postprocess_effects"))
   {
     Camera->EnablePostProcessingEffects(

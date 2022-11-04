@@ -9,6 +9,7 @@
 
 #include "Carla/Game/CarlaStatics.h"
 
+#include "Math/Matrix.h"
 #include "Async/Async.h"
 #include "Components/DrawFrustumComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
@@ -20,6 +21,8 @@
 #include "HighResScreenshot.h"
 #include "Misc/CoreDelegates.h"
 #include "RHICommandList.h"
+#include "Camera/CameraTypes.h"
+#include "Math/OrthoMatrix.h"
 
 static auto SCENE_CAPTURE_COUNTER = 0u;
 
@@ -92,6 +95,15 @@ void ASceneCaptureSensor::SetFOVAngle(const float FOVAngle)
 {
   check(CaptureComponent2D != nullptr);
   CaptureComponent2D->FOVAngle = FOVAngle;
+}
+
+void ASceneCaptureSensor::SetupOrtho(
+    float OrthoWidth
+  )
+{
+  check(CaptureComponent2D != nullptr);
+  CaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
+  CaptureComponent2D->OrthoWidth = OrthoWidth;
 }
 
 float ASceneCaptureSensor::GetFOVAngle() const
